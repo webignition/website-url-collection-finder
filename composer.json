@@ -1,0 +1,31 @@
+{
+    "name": "webignition/WebsiteUrlCollectionFinder",
+    "description": "Crawl a site, get ALL the URLs",
+    "keywords": ["http", "crawler", "links"],
+    "homepage": "https://github.com/webignition/website-url-collection-finder",
+    "type": "library",
+    "license": "WTFPL",
+    "authors": [
+        {
+            "name": "Jon Cram",
+            "email": "jon@webignition.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "ext-http": "*",
+        "webignition/http-client": "*",
+        "webignition/html-document-link-url-finder": "*"
+        
+    },
+    "repositories": [
+        {
+            "type":"vcs",
+            "url": "https://github.com/webignition/http-client"
+        },
+        {
+            "type":"vcs",
+            "url": "https://github.com/webignition/html-document-link-url-finder"
+        }        
+    ]
+}
