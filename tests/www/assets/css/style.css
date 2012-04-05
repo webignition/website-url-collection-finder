@@ -1,0 +1,8 @@
+.job-summary h2 {
+    display:inline;
+}
+
+.job-summary #form-cancel {
+    display:inline;
+    margin-left:15px;
+}
