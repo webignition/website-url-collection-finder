@@ -26,6 +26,10 @@
         {
             "type":"vcs",
             "url": "https://github.com/webignition/html-document-link-url-finder"
-        }        
+        },
+        {
+            "type":"vcs",
+            "url": "https://github.com/webignition/absolute-url-deriver"
+        }          
     ]
 }

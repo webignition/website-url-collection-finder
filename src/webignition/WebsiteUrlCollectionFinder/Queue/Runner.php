@@ -109,7 +109,7 @@ class Runner {
     private function httpClient() {
         if (is_null($this->httpClient)) {
             $this->httpClient = new \webignition\Http\Client\CachingClient();
-            $this->httpClient->enableFollowRedirect();
+            $this->httpClient->redirectHandler()->enable();
         }
         
         return $this->httpClient;
