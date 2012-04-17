@@ -250,9 +250,17 @@ class UrlScopeComparer {
             return false;
         }
         
+        if (!isset($this->equivalentSchemes[$this->sourceUrlParts['scheme']])) {
+            return false;
+        }
+        
         if ($this->equivalentSchemes[$this->sourceUrlParts['scheme']] == $this->comparatorUrlParts['scheme']) {
             return true;
         }
+        
+        if (!isset($this->equivalentSchemes[$this->comparatorUrlParts['scheme']])) {
+            return false;
+        }        
         
         if ($this->equivalentSchemes[$this->comparatorUrlParts['scheme']] == $this->sourceUrlParts['scheme']) {
             return true;
