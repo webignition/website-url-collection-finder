@@ -1,3 +1,3 @@
 <form method="post" action="/run/">
-    <input type="submit" value="Run queue" />
+    <input id="form-run-queue" type="submit" value="Run queue" />
 </form>
