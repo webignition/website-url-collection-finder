@@ -9,6 +9,9 @@ namespace webignition\WebsiteUrlCollectionFinder\Test;
  */
 class Controller {
     
+    const QUEUE_TYPE_DIRECTORY = 'directory';
+    const QUEUE_TYPE_FILE = 'file';
+    
     const DATA_RELATIVE_PATH = '/website-url-collection-finder';
     const JOB_FILENAME = 'job';
     
@@ -31,11 +34,29 @@ class Controller {
         self::PROCESSED_QUEUE_NAME
     );
     
+    private $queueType = self::QUEUE_TYPE_FILE;    
+    
     
     public function __construct() {
         foreach ($this->queueNames as $queueName) {
+            $this->initialiseQueue($queueName);
+        }
+    }
+    
+    
+    /**
+     *
+     * @param string $queueName 
+     */
+    public function initialiseQueue($queueName) {        
+        if ($this->queueType == self::QUEUE_TYPE_DIRECTORY) {
             $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\DirectoryQueue\DirectoryQueue();
-            $this->queues[$queueName]->initialise($this->queuePath($queueName));
+            $this->queues[$queueName]->initialise($this->directoryQueuePath($queueName));              
+        }
+        
+        if ($this->queueType == self::QUEUE_TYPE_FILE) {
+            $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\FileQueue\FileQueue();
+            $this->queues[$queueName]->initialise($this->fileQueuePath($queueName));              
         }
     }
     
@@ -116,7 +137,7 @@ class Controller {
      * @param string $queueName
      * @return string 
      */
-    private function queuePath($queueName) {
+    private function directoryQueuePath($queueName) {
         $queuePath = $this->dataPath() . '/' . $queueName;
         
         if (!file_exists($queuePath)) {
@@ -125,6 +146,20 @@ class Controller {
         
         return $queuePath;        
     }
+    
+    
+    /**
+     *
+     * @param string $queueName
+     * @return string 
+     */
+    private function fileQueuePath($queueName) {        
+        if (!file_exists($this->dataPath())) {
+            mkdir($this->dataPath(), 0777, true);
+        }
+        
+        return $this->dataPath() . '/' . $queueName;        
+    }    
 
     
     /**

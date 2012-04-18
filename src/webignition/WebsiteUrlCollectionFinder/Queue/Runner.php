@@ -68,24 +68,20 @@ class Runner {
     public function setJobUrl($jobUrl) {
         $this->jobUrl = $jobUrl;
     }
-    
-    
-    
-    
-    
+
     
     public function doNext() {
         if (!$this->hasNewQueue() || !$this->hasProcessedQueue()) {
             return null;
         }
         
-        $nextUrl = $this->newQueue->dequeue(); // 1        
+        $nextUrl = $this->newQueue->dequeue(); 
         
         $request = new \HttpRequest($nextUrl);       
-        $response = $this->httpClient()->getResponse($request); // 2
+        $response = $this->httpClient()->getResponse($request);
         
-        $this->processedQueue->enqueue($nextUrl); // 3
-        
+        $this->processedQueue->enqueue($nextUrl);
+      
         $linkFinder = new \webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder();
         $linkFinder->setSourceContent($response->getBody());
         $linkFinder->setSourceUrl($request->getUrl());
