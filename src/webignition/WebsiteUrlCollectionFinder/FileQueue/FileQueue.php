@@ -46,7 +46,12 @@ class FileQueue extends Queue\Queue {
     
     private function removeFirst() {
         $newItems = array_slice($this->items(), 1);
-        file_put_contents($this->path, implode("\n", $newItems));
+        $contents = implode("\n", $newItems);
+        if ($contents != '') {
+            $contents .= "\n";
+        }       
+        
+        file_put_contents($this->path, $contents);
     }
        
     
@@ -54,7 +59,7 @@ class FileQueue extends Queue\Queue {
      *
      * @return array
      */
-    public function contents() {
+    public function contents() {        
         return file($this->path);
     }
     
