@@ -6,3 +6,17 @@
     display:inline;
     margin-left:15px;
 }
+
+.queue {
+    position:absolute;
+    width:49%;
+    overflow:hidden;
+}
+
+.queue-new {
+    left:0px;
+}
+
+.queue-processed {
+    right:0px;
+}
