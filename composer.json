@@ -1,5 +1,5 @@
 {
-    "name": "webignition/WebsiteUrlCollectionFinder",
+    "name": "webignition/website-url-collection-finder",
     "description": "Crawl a site, get ALL the URLs",
     "keywords": ["http", "crawler", "links"],
     "homepage": "https://github.com/webignition/website-url-collection-finder",
