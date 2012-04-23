@@ -31,13 +31,6 @@ class Runner {
     
     /**
      *
-     * @var \webignition\Http\Client\CachingClient 
-     */
-    private $httpClient = null;
-    
-    
-    /**
-     *
      * @var 
      */
     private $urlScopeComparer = null;
@@ -70,23 +63,25 @@ class Runner {
     }
 
     
-    public function doNext() {
+    public function doNext() {       
         if (!$this->hasNewQueue() || !$this->hasProcessedQueue()) {
             return null;
         }
         
         $nextUrl = $this->newQueue->dequeue(); 
         
-        $request = new \HttpRequest($nextUrl);       
-        $response = $this->httpClient()->getResponse($request);
+        set_exception_handler(function ($exception) {
+            var_dump($exception);
+            exit();
+        });        
         
-        $this->processedQueue->enqueue($nextUrl);
-      
-        $linkFinder = new \webignition\HtmlDocumentLinkUrlFinder\HtmlDocumentLinkUrlFinder();
-        $linkFinder->setSourceContent($response->getBody());
-        $linkFinder->setSourceUrl($request->getUrl());
-        
+        $linkFinder = new \webignition\WebDocumentLinkUrlFinder\WebDocumentLinkUrlFinder();
+        $linkFinder->setSourceUrl($nextUrl);
         $urls = $linkFinder->urls();
+        
+        restore_exception_handler();               
+        
+        $this->processedQueue->enqueue($nextUrl);        
         
         foreach ($urls as $url) {            
             if ($this->urlScopeComparer()->isInScope($url)) {
@@ -95,20 +90,6 @@ class Runner {
                 }
             }
         }
-    }
-    
-    
-    /**
-     *
-     * @return webignition\Http\Client\Client
-     */
-    private function httpClient() {
-        if (is_null($this->httpClient)) {
-            $this->httpClient = new \webignition\Http\Client\CachingClient();
-            $this->httpClient->redirectHandler()->enable();
-        }
-        
-        return $this->httpClient;
     }
     
     
@@ -161,6 +142,5 @@ class Runner {
             $this->urlScopeComparer->addEquivalentHost('www.'.$jobUrlHost);
         }
     }
-    
     
 }
