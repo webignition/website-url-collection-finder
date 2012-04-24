@@ -126,15 +126,15 @@ class FileQueue extends Queue\Queue {
      * @return array
      */
     private function items() { 
-        if (!$this->hasItems()) {            
+        if (!$this->hasItems()) {
             $this->items = array();
             
-            $fileHandle = fopen($this->path, 'r');
-            while (($nextLine = $this->readNextLine($fileHandle)) != null) {
-                $this->items[] = $nextLine;
+            if (filesize($this->path) > 0) {
+                $fileHandle = fopen($this->path, 'r');    
+                $contents = trim(fread($fileHandle, filesize($this->path)));                
+                $this->items = explode("\n", $contents);
+                fclose($fileHandle);                 
             }
-
-            fclose($fileHandle);           
         }
         
         return $this->items;
