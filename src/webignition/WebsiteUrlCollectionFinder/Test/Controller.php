@@ -11,6 +11,7 @@ class Controller {
     
     const QUEUE_TYPE_DIRECTORY = 'directory';
     const QUEUE_TYPE_FILE = 'file';
+    const QUEUE_TYPE_MEMCACHED = 'memcached';
     
     const DATA_RELATIVE_PATH = '/website-url-collection-finder';
     const JOB_FILENAME = 'job';
@@ -34,12 +35,12 @@ class Controller {
         self::PROCESSED_QUEUE_NAME
     );
     
-    private $queueType = self::QUEUE_TYPE_FILE;    
+    private $queueType = self::QUEUE_TYPE_MEMCACHED;    
     
     
     public function __construct() {
         foreach ($this->queueNames as $queueName) {
-            $this->initialiseQueue($queueName);
+            $this->initialiseQueue($queueName);            
         }
     }
     
@@ -58,6 +59,14 @@ class Controller {
             $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\FileQueue\FileQueue();
             $this->queues[$queueName]->initialise($this->fileQueuePath($queueName));              
         }
+        
+        if ($this->queueType == self::QUEUE_TYPE_MEMCACHED) {
+            $memcached = new \Memcached();
+            $memcached->addServer('localhost', 11211);
+            
+            $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\MemcachedQueue\MemcachedQueue();
+            $this->queues[$queueName]->initialise($memcached, $queueName);              
+        }        
     }
     
     
@@ -181,7 +190,7 @@ class Controller {
      * @return webignition\WebsiteUrlCollectionFinder\Queue\Runner 
      */
     public function queueRunner() {
-        if (is_null($this->queueRunner)) {
+        if (is_null($this->queueRunner)) {            
             $this->queueRunner = new \webignition\WebsiteUrlCollectionFinder\Queue\Runner();
             $this->queueRunner->setNewQueue($this->queues[self::NEW_QUEUE_NAME]);
             $this->queueRunner->setProcessedQueue($this->queues[self::PROCESSED_QUEUE_NAME]);
