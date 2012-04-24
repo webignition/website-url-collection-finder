@@ -8,8 +8,7 @@ use webignition\WebsiteUrlCollectionFinder\Queue;
  * @package webignition\WebsiteUrlCollectionFinder\FileQueue
  *
  */
-class FileQueue extends Queue\Queue {
-    
+class FileQueue extends Queue\Queue {    
  
     
     /**
@@ -35,6 +34,8 @@ class FileQueue extends Queue\Queue {
         if (!file_exists($this->path)) {
             file_put_contents($this->path, '');
         }
+        
+        $this->items();
     }
     
     
@@ -50,31 +51,21 @@ class FileQueue extends Queue\Queue {
      */
     public function enqueue($url) {     
         if (!$this->contains($url)) {
-            $fileHandle = fopen($this->path, 'a');
-            fwrite($fileHandle, $url."\n");
-            fclose($fileHandle);         
+            array_push($this->items, $url);
         }
     }
     
+    /**
+     *
+     * @return string 
+     */
     public function dequeue() {
-        $first = $this->getFirst();
-        $this->removeFirst();
-        
-        return $first;
+        return array_shift($this->items);
     }
     
     
-    public function clear() {
-        file_put_contents($this->path, '');
-        $this->reset();
-    }
-    
-    
-    private function removeFirst() {
-        $items = $this->items();
-        array_shift($items);
- 
-        $contents = implode("\n", $items);
+    public function save() {        
+        $contents = implode("\n", $this->items);
         if ($contents != '') {
             $contents .= "\n";
         }
@@ -82,6 +73,21 @@ class FileQueue extends Queue\Queue {
         $fileHandle = fopen($this->path, 'w');
         fwrite($fileHandle, $contents);
         fclose($fileHandle);
+    }
+    
+    
+    /**
+     *
+     * @return int
+     */
+    public function length() {
+        return count($this->items());
+    }
+    
+    
+    public function clear() {
+        file_put_contents($this->path, '');
+        $this->reset();
     }
        
     
@@ -99,14 +105,7 @@ class FileQueue extends Queue\Queue {
      * 
      * @return string
      */
-    public function getFirst() {
-        if (!$this->hasItems()) {
-            $fileHandle = fopen($this->path, 'r');
-            $firstLine = $this->readNextLine($fileHandle);  
-            fclose($fileHandle);
-            return $firstLine;            
-        }
-        
+    public function getFirst() {        
         $items = $this->items();
         return array_shift($items);
     }
@@ -127,7 +126,7 @@ class FileQueue extends Queue\Queue {
      * @return array
      */
     private function items() { 
-        if (!$this->hasItems()) {
+        if (!$this->hasItems()) {            
             $this->items = array();
             
             $fileHandle = fopen($this->path, 'r');
