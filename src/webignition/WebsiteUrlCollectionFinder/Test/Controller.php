@@ -111,6 +111,7 @@ class Controller {
         $this->saveJob();
         
         $this->queues[self::NEW_QUEUE_NAME]->enqueue($url);
+        $this->queues[self::NEW_QUEUE_NAME]->save();
     }
     
     

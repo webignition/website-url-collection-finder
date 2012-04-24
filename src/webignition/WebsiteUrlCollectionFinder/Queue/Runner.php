@@ -37,6 +37,18 @@ class Runner {
     
     
     /**
+     * Collection of method names for which queue states should be persisted
+     * each time the method is called
+     * 
+     * Persistence of queues is expensive, performance is improved if we
+     * only persist when needed
+     * 
+     * @var array
+     */
+    private $persistOn = array();    
+    
+    
+    /**
      *
      * @param webignition\WebsiteUrlCollectionFinder\Queue\Queue $newQueue 
      */
@@ -53,6 +65,23 @@ class Runner {
         $this->processedQueue = $processedQueue;
     }
     
+    /**
+     *
+     * @param string $methodName 
+     */
+    public function enablePersistOn($methodName) {        
+        $this->persistOn[$methodName] = true;
+
+    }
+    
+    /**
+     *
+     * @param string $methodName 
+     */
+    public function disablePersistOn($methodName) {
+        unset($this->persistOn[$methodName]);
+    }    
+    
     
     /**
      *
@@ -63,12 +92,12 @@ class Runner {
     }
 
     
-    public function doNext() {       
+    public function doNext() {         
         if (!$this->hasNewQueue() || !$this->hasProcessedQueue()) {
             return null;
         }
-        
-        $nextUrl = $this->newQueue->dequeue(); 
+
+        $nextUrl = $this->newQueue->dequeue();
         
         set_exception_handler(function ($exception) {
             var_dump($exception);
@@ -77,8 +106,8 @@ class Runner {
         
         $linkFinder = new \webignition\WebDocumentLinkUrlFinder\WebDocumentLinkUrlFinder();
         $linkFinder->setSourceUrl($nextUrl);
-        $urls = $linkFinder->urls();
-        
+        $urls = $linkFinder->urls(); 
+
         restore_exception_handler();               
         
         $this->processedQueue->enqueue($nextUrl);        
@@ -90,6 +119,39 @@ class Runner {
                 }
             }
         }
+        
+        if ($this->shouldPersistOn(__FUNCTION__)) {
+            $this->newQueue->save();
+            $this->processedQueue->save();
+        }       
+    }
+    
+    
+    
+    public function doNextBatch($batchSize = 1) {        
+        $batchCount = 0;
+        while (($batchCount < $batchSize) && $this->newQueue->length() > 0) {
+            $this->doNext();
+            $batchCount++;
+        }        
+        
+        if ($this->shouldPersistOn(__FUNCTION__)) {
+            $this->newQueue->save();
+            $this->processedQueue->save();            
+        }
+        
+        $this->newQueue->reset();
+        $this->processedQueue->reset();       
+    }
+    
+    
+    /**
+     *
+     * @param string $methodName
+     * @return boolean 
+     */
+    private function shouldPersistOn($methodName) {        
+        return isset($this->persistOn[$methodName]);
     }
     
     
