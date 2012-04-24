@@ -124,8 +124,7 @@ class Runner {
             $this->newQueue->save();
             $this->processedQueue->save();
         }       
-    }
-    
+    }    
     
     
     public function doNextBatch($batchSize = 1) {        
@@ -137,11 +136,16 @@ class Runner {
         
         if ($this->shouldPersistOn(__FUNCTION__)) {
             $this->newQueue->save();
-            $this->processedQueue->save();            
-        }
-        
-        $this->newQueue->reset();
-        $this->processedQueue->reset();       
+            $this->processedQueue->save();
+            $this->newQueue->reset();
+            $this->processedQueue->reset();               
+        }    
+    }
+    
+    
+    public function persistQueues() {
+        $this->newQueue->save();
+        $this->processedQueue->save();          
     }
     
     
