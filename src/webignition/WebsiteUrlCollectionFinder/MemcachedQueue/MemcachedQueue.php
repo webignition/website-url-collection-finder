@@ -83,9 +83,9 @@ class MemcachedQueue extends Queue\Queue {
     }
     
     
-    public function clear() {
-        file_put_contents($this->path, '');
+    public function clear() {        
         $this->reset();
+        $this->save();
     }
        
     
