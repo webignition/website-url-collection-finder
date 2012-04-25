@@ -1,14 +1,14 @@
 <?php
 
 namespace webignition\WebsiteUrlCollectionFinder\FileQueue;
-use webignition\WebsiteUrlCollectionFinder\Queue;
+use webignition\WebsiteUrlCollectionFinder\UrlQueue;
 
 /**
  * 
  * @package webignition\WebsiteUrlCollectionFinder\FileQueue
  *
  */
-class FileQueue extends Queue\Queue {    
+class FileQueue extends UrlQueue\UrlQueue {    
  
     
     /**
@@ -20,13 +20,6 @@ class FileQueue extends Queue\Queue {
     
     /**
      *
-     * @var array
-     */
-    private $items = null;
-    
-    
-    /**
-     *
      * @param string $path 
      */
     public function initialise($path) {
@@ -34,38 +27,17 @@ class FileQueue extends Queue\Queue {
         if (!file_exists($this->path)) {
             file_put_contents($this->path, '');
         }
-        
-        $this->items();
     }
-    
-    
-    
-    public function reset() {
-        $this->items = null;
-    }
-    
-    
-    /**
-     *
-     * @param string $url 
-     */
-    public function enqueue($url) {     
-        if (!$this->contains($url)) {
-            array_push($this->items, $url);
-        }
-    }
-    
-    /**
-     *
-     * @return string 
-     */
-    public function dequeue() {
-        return array_shift($this->items);
-    }
+
     
     
     public function save() {        
-        $contents = implode("\n", $this->items);
+        if (is_null($this->items)) {
+            file_put_contents($this->path, '');
+            return;
+        }
+        
+        $contents = implode("\n", $this->items);        
         if ($contents != '') {
             $contents .= "\n";
         }
@@ -74,95 +46,18 @@ class FileQueue extends Queue\Queue {
         fwrite($fileHandle, $contents);
         fclose($fileHandle);
     }
+
+
     
-    
-    /**
-     *
-     * @return int
-     */
-    public function length() {
-        return count($this->items());
-    }
-    
-    
-    public function clear() {
-        file_put_contents($this->path, '');
-        $this->reset();
-    }
-       
-    
-    /**
-     *
-     * @return array
-     */
-    public function contents() {        
-        return $this->items();
-    }
-    
-    
-    /**
-     * Get first URL from queue
-     * 
-     * @return string
-     */
-    public function getFirst() {        
-        $items = $this->items();
-        return array_shift($items);
-    }
-    
-    
-    /**
-     *
-     * @param string $url
-     * @return string
-     */
-    public function contains($url) {
-        return in_array($url, $this->items());
-    }
-    
-    
-    /**
-     *
-     * @return array
-     */
-    private function items() { 
-        if (!$this->hasItems()) {
-            $this->items = array();
-            
-            if (filesize($this->path) > 0) {
-                $fileHandle = fopen($this->path, 'r');    
-                $contents = trim(fread($fileHandle, filesize($this->path)));                
-                $this->items = explode("\n", $contents);
-                fclose($fileHandle);                 
-            }
-        }
+    protected function load() {
+        $this->items = array();
         
-        return $this->items;
-    }
-    
-    
-    /**
-     *
-     * @return boolean
-     */
-    private function hasItems() {
-        return $this->items !== null;
-    }
-    
-    
-    /**
-     *
-     * @param resource $fileHandle
-     * @return string 
-     */
-    private function readNextLine($fileHandle) {
-        $currentByte = '';
-        $currentContents = null;
-        while (($currentByte = fread($fileHandle, 1)) != "\n" && !feof($fileHandle)) {
-            $currentContents .= $currentByte;
-        }
-        
-        return $currentContents;
+        if (filesize($this->path) > 0) {
+            $fileHandle = fopen($this->path, 'r');    
+            $contents = trim(fread($fileHandle, filesize($this->path)));                
+            $this->items = explode("\n", $contents);
+            fclose($fileHandle);                 
+        }        
     }
 
     

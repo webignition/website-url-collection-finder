@@ -7,27 +7,20 @@ namespace webignition\WebsiteUrlCollectionFinder\Queue;
  * @package webignition\WebsiteUrlCollectionFinder\Queue
  *
  */
-abstract class Queue {    
-    
+interface Queue {    
+   
     
     /**
      *
-     * @param string $url 
+     * @param mixed $item 
      */
-    abstract public function enqueue($url);
+    public function enqueue($item);
     
     
     /**
      *
      * @return string 
      */
-    abstract public function dequeue();
-    
-    
-    /**
-     * 
-     * @param string $url 
-     */
-    abstract public function contains($url);
+    public function dequeue();
     
 }
