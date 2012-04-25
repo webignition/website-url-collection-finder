@@ -9,7 +9,6 @@ namespace webignition\WebsiteUrlCollectionFinder\Test;
  */
 class Controller {
     
-    const QUEUE_TYPE_DIRECTORY = 'directory';
     const QUEUE_TYPE_FILE = 'file';
     const QUEUE_TYPE_MEMCACHED = 'memcached';
     
@@ -28,17 +27,25 @@ class Controller {
     private $queueRunner = null;
     
     
+    /**
+     * Type of queue implementation to use
+     * 
+     * @var string
+     */
+    private $queueType = null;
+    
+        
     private $job = null;
     
     private $queueNames = array(
         self::NEW_QUEUE_NAME,
         self::PROCESSED_QUEUE_NAME
-    );
-    
-    private $queueType = self::QUEUE_TYPE_MEMCACHED;    
+    );    
     
     
     public function __construct() {
+        $this->queueType = $this->deriveQueueType();
+        
         foreach ($this->queueNames as $queueName) {
             $this->initialiseQueue($queueName);            
         }
@@ -49,12 +56,7 @@ class Controller {
      *
      * @param string $queueName 
      */
-    public function initialiseQueue($queueName) {        
-        if ($this->queueType == self::QUEUE_TYPE_DIRECTORY) {
-            $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\DirectoryQueue\DirectoryQueue();
-            $this->queues[$queueName]->initialise($this->directoryQueuePath($queueName));              
-        }
-        
+    public function initialiseQueue($queueName) {                
         if ($this->queueType == self::QUEUE_TYPE_FILE) {
             $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\FileQueue\FileQueue();
             $this->queues[$queueName]->initialise($this->fileQueuePath($queueName));              
@@ -67,6 +69,24 @@ class Controller {
             $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\MemcachedQueue\MemcachedQueue();
             $this->queues[$queueName]->initialise($memcached, $queueName);              
         }        
+    }
+    
+    
+    /**
+     * Derive best-performing queue type based on what is available in this
+     * environment.
+     * 
+     * Will use a memcached queue if possible, otherwise will fall back to
+     * a file queue
+     * 
+     * @return string
+     */
+    public function deriveQueueType() {
+        if (class_exists('Memcached')) {
+            return self::QUEUE_TYPE_MEMCACHED;
+        }
+        
+        return self::QUEUE_TYPE_FILE;
     }
     
     
