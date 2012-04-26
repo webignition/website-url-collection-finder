@@ -2,27 +2,17 @@ var application = {
     
     runQueue: function (callback) {
         $.get('/run/?ajax', function (data) {               
-            $.get('/queue/new.php', function (newQueueItems) {
-                $('#new-queue-count').text(newQueueItems.length);
+            $.get('/queue/totals.php', function (totals) {                
+                $('#new-queue-count').text(totals['new']);
+                
                 var newQueueList = $('#new-queue-list');
-                newQueueList.html('');
-
-                for (var newQueueItemIndex = 0; newQueueItemIndex < newQueueItems.length; newQueueItemIndex++) {
-                    newQueueList.append('<li>'+newQueueItems[newQueueItemIndex]+'</li>');
-                }                    
-
-                $.get('/queue/processed.php', function (processedQueueItems) {
-                    $('#processed-queue-count').text(processedQueueItems.length);
-                    var processedQueueList = $('#processed-queue-list');
-                    processedQueueList.html('');
-
-                    for (var processedQueueItemIndex = 0; processedQueueItemIndex < processedQueueItems.length; processedQueueItemIndex++) {
-                        processedQueueList.append('<li>'+processedQueueItems[processedQueueItemIndex]+'</li>');
-                    } 
-                    
-                    callback();
-                }, 'json');                    
-
+                newQueueList.html(''); 
+                
+                $('#processed-queue-count').text(totals['processed']);
+                var processedQueueList = $('#processed-queue-list');
+                processedQueueList.html('');
+                
+                callback();
             }, 'json');
 
         }, 'json');        
