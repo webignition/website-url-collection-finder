@@ -37,14 +37,20 @@ class MemcachedQueue extends UrlQueue\UrlQueue {
     }
     
     public function save() {
-        $this->memcached->set($this->key, $this->items);
+        $this->memcached->set($this->key, $this->serialize());        
     }    
     
-    protected function load() {
-        $this->items = $this->memcached->get($this->key);
-        if (!$this->items) {
-            $this->items = array();
-        }
+    protected function load() { 
+        $this->unserialize($this->memcached->get($this->key));      
+    }
+    
+    
+    public function serialize() {
+        return implode("\n", $this->items);
+    }
+    
+    public function unserialize($string) {
+        $this->items =  explode("\n", trim($string));
     }
   
 
