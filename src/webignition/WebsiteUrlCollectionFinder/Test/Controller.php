@@ -63,7 +63,7 @@ class Controller {
         }
         
         if ($this->queueType == self::QUEUE_TYPE_MEMCACHED) {
-            $memcached = new \Memcached();            
+            $memcached = new \Memcached();
             $memcached->addServer('localhost', 11211);
             
             $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\MemcachedQueue\MemcachedQueue();
@@ -82,6 +82,8 @@ class Controller {
      * @return string
      */
     public function deriveQueueType() {
+        return self::QUEUE_TYPE_FILE;
+        
         if (class_exists('Memcached')) {
             return self::QUEUE_TYPE_MEMCACHED;
         }
