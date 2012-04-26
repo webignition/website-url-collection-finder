@@ -63,7 +63,7 @@ class Controller {
         }
         
         if ($this->queueType == self::QUEUE_TYPE_MEMCACHED) {
-            $memcached = new \Memcached();
+            $memcached = new \Memcached();            
             $memcached->addServer('localhost', 11211);
             
             $this->queues[$queueName] = new \webignition\WebsiteUrlCollectionFinder\MemcachedQueue\MemcachedQueue();
@@ -108,7 +108,7 @@ class Controller {
     /**
      *
      * @param string $queueName
-     * @return \webignition\WebsiteUrlCollectionFinder\DirectoryQueue\DirectoryQueue 
+     * @return \webignition\WebsiteUrlCollectionFinder\UrlQueue\UrlQueue 
      */
     public function queue($queueName) {
         return $this->queues[$queueName];
@@ -139,6 +139,7 @@ class Controller {
         
         $this->saveJob();
         
+        $this->initialiseQueue(self::NEW_QUEUE_NAME);
         $this->queues[self::NEW_QUEUE_NAME]->enqueue($url);
         $this->queues[self::NEW_QUEUE_NAME]->save();
     }
