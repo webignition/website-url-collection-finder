@@ -32,7 +32,6 @@ abstract class UrlQueue implements Queue\Queue {
     abstract protected function save();    
     
     
-    
     public function reset() {
         $this->items = null;
     }
@@ -49,7 +48,7 @@ abstract class UrlQueue implements Queue\Queue {
      * @param string $url 
      */
     public function enqueue($url) {
-        array_push($this->items, $url);
+        $this->items[] = $url;
     }
     
     /**
