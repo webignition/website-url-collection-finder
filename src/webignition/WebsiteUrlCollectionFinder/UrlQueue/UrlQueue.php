@@ -48,10 +48,8 @@ abstract class UrlQueue implements Queue\Queue {
      *
      * @param string $url 
      */
-    public function enqueue($url) {     
-        if (!$this->contains($url)) {
-            array_push($this->items, $url);
-        }
+    public function enqueue($url) {
+        array_push($this->items, $url);
     }
     
     /**
