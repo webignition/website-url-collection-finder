@@ -11,13 +11,13 @@ class Runner {
     
     /**
      *
-     * @var webignition\WebsiteUrlCollectionFinder\Queue\Queue
+     * @var webignition\WebsiteUrlCollectionFinder\UrlQueue\UrlQueue
      */
     private $newQueue = null;
     
     /**
      *
-     * @var webignition\WebsiteUrlCollectionFinder\Queue\Queue
+     * @var webignition\WebsiteUrlCollectionFinder\UrlQueue\UrlQueue
      */
     private $processedQueue = null;
     
@@ -33,26 +33,14 @@ class Runner {
      *
      * @var 
      */
-    private $urlScopeComparer = null;
-    
-    
-    /**
-     * Collection of method names for which queue states should be persisted
-     * each time the method is called
-     * 
-     * Persistence of queues is expensive, performance is improved if we
-     * only persist when needed
-     * 
-     * @var array
-     */
-    private $persistOn = array();    
+    private $urlScopeComparer = null;  
     
     
     /**
      *
-     * @param webignition\WebsiteUrlCollectionFinder\Queue\Queue $newQueue 
+     * @param webignition\WebsiteUrlCollectionFinder\UrlQueue\UrlQueue $newQueue 
      */
-    public function setNewQueue(\webignition\WebsiteUrlCollectionFinder\Queue\Queue $newQueue) {
+    public function setNewQueue(\webignition\WebsiteUrlCollectionFinder\UrlQueue\UrlQueue $newQueue) {
         $this->newQueue = $newQueue;
     }
     
@@ -61,26 +49,9 @@ class Runner {
      *
      * @param webignition\WebsiteUrlCollectionFinder\Queue\Queue $processedQueue 
      */
-    public function setProcessedQueue(\webignition\WebsiteUrlCollectionFinder\Queue\Queue $processedQueue) {
+    public function setProcessedQueue(\webignition\WebsiteUrlCollectionFinder\UrlQueue\UrlQueue $processedQueue) {
         $this->processedQueue = $processedQueue;
-    }
-    
-    /**
-     *
-     * @param string $methodName 
-     */
-    public function enablePersistOn($methodName) {        
-        $this->persistOn[$methodName] = true;
-
-    }
-    
-    /**
-     *
-     * @param string $methodName 
-     */
-    public function disablePersistOn($methodName) {
-        unset($this->persistOn[$methodName]);
-    }    
+    }   
     
     
     /**
@@ -118,12 +89,7 @@ class Runner {
                     $this->newQueue->enqueue($url);
                 }
             }
-        }
-        
-        if ($this->shouldPersistOn(__FUNCTION__)) {
-            $this->newQueue->save();
-            $this->processedQueue->save();
-        }       
+        }      
     }    
     
     
@@ -132,14 +98,7 @@ class Runner {
         while (($batchCount < $batchSize) && $this->newQueue->length() > 0) {
             $this->doNext();
             $batchCount++;
-        }        
-        
-        if ($this->shouldPersistOn(__FUNCTION__)) {
-            $this->newQueue->save();
-            $this->processedQueue->save();
-            $this->newQueue->reset();
-            $this->processedQueue->reset();               
-        }    
+        }
     }
     
     
@@ -149,13 +108,12 @@ class Runner {
     }
     
     
-    /**
-     *
-     * @param string $methodName
-     * @return boolean 
-     */
-    private function shouldPersistOn($methodName) {        
-        return isset($this->persistOn[$methodName]);
+    public function newQueue() {
+        return $this->newQueue;
+    }
+    
+    public function processedQueue() {
+        return $this->processedQueue;
     }
     
     

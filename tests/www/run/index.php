@@ -5,11 +5,8 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/../../lib/bootstrap.php');
 
 $controller = new \webignition\WebsiteUrlCollectionFinder\Test\Controller();
 
-//$controller->queueRunner()->enablePersistOn('doNext');
-//$controller->queueRunner()->doNext();
-
-$controller->queueRunner()->enablePersistOn('doNextBatch');
-$controller->queueRunner()->doNextBatch(10);
+$controller->queueRunner()->doNextBatch(1);
+$controller->queueRunner()->persistQueues();
 
 if (!isset($_GET['ajax'])) {
     header('Location: http://' . $_SERVER['HTTP_HOST']);    
