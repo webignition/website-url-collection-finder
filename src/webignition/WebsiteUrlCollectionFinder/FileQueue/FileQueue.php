@@ -26,12 +26,13 @@ class FileQueue extends UrlQueue\UrlQueue {
         $this->path = $path;
         if (!file_exists($this->path)) {
             file_put_contents($this->path, '');
-        }
+        }       
+        
+        
+        $this->items();
     }
-
     
-    
-    public function save() {        
+    public function save() {          
         if (is_null($this->items)) {
             file_put_contents($this->path, '');
             return;
@@ -54,11 +55,11 @@ class FileQueue extends UrlQueue\UrlQueue {
         
         if (filesize($this->path) > 0) {
             $fileHandle = fopen($this->path, 'r');    
-            $contents = trim(fread($fileHandle, filesize($this->path)));                
-            $this->items = explode("\n", $contents);
-            fclose($fileHandle);                 
-        }        
-    }
+            $this->contents = trim(fread($fileHandle, filesize($this->path)));                
+            $this->items = explode("\n", $this->contents);
+            fclose($fileHandle);
+        }
+    } 
 
     
 
