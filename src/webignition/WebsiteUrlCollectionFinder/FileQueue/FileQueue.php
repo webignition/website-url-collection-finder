@@ -58,6 +58,10 @@ class FileQueue extends UrlQueue\UrlQueue {
             $this->contents = trim(fread($fileHandle, filesize($this->path)));                
             $this->items = explode("\n", $this->contents);
             fclose($fileHandle);
+            
+            foreach ($this->items as $item) {
+                $this->index[$item] = true;
+            }
         }
     } 
 

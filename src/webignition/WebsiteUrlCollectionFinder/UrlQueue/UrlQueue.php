@@ -19,6 +19,14 @@ abstract class UrlQueue implements Queue\Queue {
     
     
     /**
+     * Index of items, for fast comparisons
+     * 
+     * @var array
+     */
+    protected $index = null;
+    
+    
+    /**
      * Populate $this->items
      *  
      */
@@ -34,6 +42,7 @@ abstract class UrlQueue implements Queue\Queue {
     
     public function reset() {
         $this->items = null;
+        $this->index = null;
     }
     
     
@@ -49,6 +58,7 @@ abstract class UrlQueue implements Queue\Queue {
      */
     public function enqueue($url) {
         $this->items[] = $url;
+        $this->index[$url] = true;
     }
     
     /**
@@ -56,7 +66,9 @@ abstract class UrlQueue implements Queue\Queue {
      * @return string 
      */
     public function dequeue() {
-        return array_shift($this->items);
+        $first = array_shift($this->items);
+        unset($this->index[$first]);
+        return $first;
     }    
     
     
@@ -84,7 +96,7 @@ abstract class UrlQueue implements Queue\Queue {
      * @return string
      */
     public function contains($url) {
-        return in_array($url, $this->items());
+        return array_key_exists($url, $this->index);
     }
     
     
