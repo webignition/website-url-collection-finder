@@ -19,11 +19,10 @@ abstract class UrlQueue implements Queue\Queue {
     
     
     /**
-     * Index of items, for fast comparisons
-     * 
-     * @var array
+     *
+     * @var int
      */
-    protected $index = array();
+    private $length = 0;
     
     
     /**
@@ -41,8 +40,7 @@ abstract class UrlQueue implements Queue\Queue {
     
     
     public function reset() {
-        $this->items = null;
-        $this->index = array();
+        $this->items = null;   
     }
     
     
@@ -57,8 +55,8 @@ abstract class UrlQueue implements Queue\Queue {
      * @param string $url 
      */
     public function enqueue($url) {
-        $this->items[] = $url;
-        $this->index[$url] = true;
+        $this->items[$url] = true;
+        $this->length++;
     }
     
     /**
@@ -66,8 +64,10 @@ abstract class UrlQueue implements Queue\Queue {
      * @return string 
      */
     public function dequeue() {
-        $first = array_shift($this->items);
-        unset($this->index[$first]);
+        reset($this->items);
+        $first = key($this->items);        
+        unset($this->items[$first]);
+        $this->length--;
         return $first;
     }    
     
@@ -77,7 +77,7 @@ abstract class UrlQueue implements Queue\Queue {
      * @return array
      */
     public function contents() {        
-        return $this->items();
+        return array_keys($this->items());
     }
     
     
@@ -86,7 +86,7 @@ abstract class UrlQueue implements Queue\Queue {
      * @return int
      */
     public function length() {
-        return count($this->items());
+        return $this->length;
     }    
     
     
@@ -96,7 +96,7 @@ abstract class UrlQueue implements Queue\Queue {
      * @return string
      */
     public function contains($url) {        
-        return array_key_exists($url, $this->index);
+        return array_key_exists($url, $this->items);
     }
     
     
@@ -107,7 +107,6 @@ abstract class UrlQueue implements Queue\Queue {
     protected function items() { 
         if (!$this->hasItems()) {
             $this->load();
-            $this->buildIndex();
         }
         
         return $this->items;
@@ -119,14 +118,7 @@ abstract class UrlQueue implements Queue\Queue {
      * @return boolean
      */
     protected function hasItems() {
-        return $this->items !== null;
+        return $this->length > 0;
     } 
-    
-    
-    private function buildIndex() {
-        foreach ($this->items as $url) {
-            $this->index[$url] = true;
-        }
-    }
     
 }

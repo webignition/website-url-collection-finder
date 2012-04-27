@@ -32,16 +32,13 @@ class FileQueue extends UrlQueue\UrlQueue {
         $this->items();
     }
     
-    public function save() {          
-        if (is_null($this->items)) {
+    public function save() { 
+        if (!$this->hasItems()) {
             file_put_contents($this->path, '');
-            return;
+            return;            
         }
         
-        $contents = implode("\n", $this->items);        
-        if ($contents != '') {
-            $contents .= "\n";
-        }
+        $contents = implode("\n", $this->contents());
         
         $fileHandle = fopen($this->path, 'w');
         fwrite($fileHandle, $contents);
@@ -55,9 +52,13 @@ class FileQueue extends UrlQueue\UrlQueue {
         
         if (filesize($this->path) > 0) {
             $fileHandle = fopen($this->path, 'r');    
-            $this->contents = trim(fread($fileHandle, filesize($this->path)));                
-            $this->items = explode("\n", $this->contents);
+            $contents = explode("\n", fread($fileHandle, filesize($this->path)));
             fclose($fileHandle);
+            
+            foreach ($contents as $url) {
+                $url = trim($url);
+                $this->enqueue($url);
+            }
         }
     } 
 
