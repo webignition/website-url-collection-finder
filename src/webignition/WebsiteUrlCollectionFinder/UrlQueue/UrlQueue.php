@@ -118,6 +118,7 @@ abstract class UrlQueue implements Queue\Queue {
     protected function items() { 
         if (!$this->hasItems()) {
             $this->load();
+            $this->buildIndex();
         }
         
         return $this->items;
@@ -130,6 +131,13 @@ abstract class UrlQueue implements Queue\Queue {
      */
     protected function hasItems() {
         return $this->items !== null;
-    }    
+    } 
+    
+    
+    private function buildIndex() {
+        foreach ($this->items as $url) {
+            $this->index[$url] = true;
+        }
+    }
     
 }
