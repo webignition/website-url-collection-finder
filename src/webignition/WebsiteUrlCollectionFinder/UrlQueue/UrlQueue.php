@@ -23,7 +23,7 @@ abstract class UrlQueue implements Queue\Queue {
      * 
      * @var array
      */
-    protected $index = null;
+    protected $index = array();
     
     
     /**
@@ -42,7 +42,7 @@ abstract class UrlQueue implements Queue\Queue {
     
     public function reset() {
         $this->items = null;
-        $this->index = null;
+        $this->index = array();
     }
     
     
@@ -95,7 +95,7 @@ abstract class UrlQueue implements Queue\Queue {
      * @param string $url
      * @return string
      */
-    public function contains($url) {
+    public function contains($url) {        
         return array_key_exists($url, $this->index);
     }
     
