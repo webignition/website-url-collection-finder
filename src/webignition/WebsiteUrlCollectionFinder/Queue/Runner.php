@@ -69,6 +69,9 @@ class Runner {
         }
 
         $nextUrl = $this->newQueue->dequeue();
+        if ($this->processedQueue->contains($nextUrl)) {
+            return true;
+        }
         
         set_exception_handler(function ($exception) {
             var_dump($exception);
@@ -85,12 +88,12 @@ class Runner {
         
         foreach ($urls as $url) {            
             if ($this->urlScopeComparer()->isInScope($url)) {
-                if (!$this->processedQueue->contains($url) && !$this->newQueue->contains($url)) {
+                if (!$this->newQueue->contains($url) && !$this->processedQueue->contains($url)) {
                     $this->newQueue->enqueue($url);
-                }
+                }                
             }
         }      
-    }    
+    }
     
     
     public function doNextBatch($batchSize = 1) {        
