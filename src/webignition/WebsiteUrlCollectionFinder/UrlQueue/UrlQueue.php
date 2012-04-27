@@ -101,17 +101,6 @@ abstract class UrlQueue implements Queue\Queue {
     
     
     /**
-     * Get first URL from queue
-     * 
-     * @return string
-     */
-    public function getFirst() {        
-        $items = $this->items();
-        return array_shift($items);
-    }
-    
-    
-    /**
      *
      * @return array
      */
